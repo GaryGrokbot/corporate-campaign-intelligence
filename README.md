@@ -1,180 +1,68 @@
 # Corporate Campaign Intelligence
 
-Automate corporate campaign research - supply chains, pressure points, stakeholder relationships, strategic vulnerabilities. Turn weeks of research into hours.
+Research database and API for animal advocacy campaign targeting. Tracks the top 20 animal agriculture companies worldwide with vulnerability analysis, campaign history, and key contacts.
 
-## What It Does
+## What's Inside
 
-**Input:** Target company (e.g., "McDonald's", "Tyson Foods")
-**Output:** Complete campaign strategy package
+- **20 companies** — JBS, Tyson, Cargill, Smithfield, Hormel, Perdue, Pilgrim's Pride, and more
+- **18+ documented campaigns** — environmental, legal, consumer, investor pressure, regulatory
+- **Vulnerability analysis** — categorized by severity (critical/high/medium) across environmental, labor, governance, animal welfare, antitrust, and greenwashing dimensions
+- **Key contacts** — publicly available leadership info
 
-### Research Modules
+All data sourced from publicly available information: Wikipedia, SEC filings, sustainability reports, news coverage, NGO investigations, and court records.
 
-1. **Supply Chain Mapping**
-   - Upstream suppliers (farms, processors, distributors)
-   - Downstream customers (retailers, food service)
-   - Geographic concentration
-   - Dependency vulnerabilities
+## Quick Start
 
-2. **Corporate Structure Analysis**
-   - Ownership hierarchy
-   - Board members + backgrounds
-   - Executive compensation tied to ESG metrics?
-   - Institutional investors (influence leverage)
-
-3. **Regulatory Exposure**
-   - Recent violations (EPA, OSHA, FDA, USDA)
-   - Pending litigation
-   - State/federal inspection history
-   - Compliance costs vs revenue
-
-4. **Media & Public Pressure**
-   - Recent coverage (positive/negative)
-   - Social media presence + engagement
-   - Consumer perception trends
-   - Competitor comparisons
-
-5. **Stakeholder Mapping**
-   - Who influences the company? (investors, customers, regulators)
-   - Who do they listen to? (industry groups, consultants)
-   - Who's already pressuring them? (NGOs, activists)
-
-6. **Strategic Vulnerabilities**
-   - Brand reputation risk
-   - Investor ESG pressure
-   - Regulatory compliance costs
-   - Supply chain disruption exposure
-   - Consumer boycott susceptibility
-
-### Campaign Strategy Generation
-
-Based on research, generates:
-- **Target Selection:** Which decision-makers to reach
-- **Pressure Points:** Where company is most vulnerable
-- **Messaging:** What arguments will work (data-driven)
-- **Tactics:** Shareholder resolutions, media amplification, regulatory complaints
-- **Timeline:** Realistic milestones
-- **Resources Needed:** Budget, people, expertise
-
-## Tech Stack
-
-- **Data Collection:** Web scraping (BeautifulSoup, Playwright), API integrations
-- **Corporate Data:** OpenCorporates, SEC EDGAR, Bloomberg API (if available)
-- **Regulatory:** EPA Enforcement, OSHA logs, USDA FSIS data
-- **Media:** News APIs (NewsAPI, GDELT), social media monitoring
-- **Analysis:** NLP sentiment analysis, network graph analysis
-- **Storage:** PostgreSQL + full-text search
-- **Frontend:** React dashboard
-
-## Data Sources
-
-### Public Databases
-- SEC EDGAR (corporate filings, ownership)
-- OpenCorporates (global corporate registry)
-- EPA Enforcement & Compliance History Online (ECHO)
-- OSHA inspection database
-- USDA FSIS enforcement reports
-- Court filing databases (PACER, state courts)
-
-### News & Media
-- NewsAPI, GDELT (media monitoring)
-- Twitter/X (social sentiment)
-- Company press releases
-- Industry publications
-
-### Supply Chain
-- Import/export records (Panjiva, ImportGenius)
-- Supplier disclosures (company reports)
-- Industry connection databases
-
-### Advocacy
-- NGO reports (Human Rights Watch, Greenpeace, PETA, etc.)
-- Activist campaign archives
-- Consumer boycott tracking
-
-## MVP Scope
-
-1. **Company profile generator**
-   - Basic info (revenue, size, locations)
-   - Recent news sentiment
-   - Known violations
-
-2. **Supply chain mapper**
-   - Identify major suppliers
-   - Map dependencies
-
-3. **Pressure point analyzer**
-   - Regulatory exposure score
-   - Media sentiment score
-   - Investor ESG alignment
-
-4. **Campaign strategy template**
-   - Pre-filled with company data
-   - Recommended tactics
-   - Key targets
-
-## Usage
-
-```python
-from campaign_intel import CampaignAnalyzer
-
-analyzer = CampaignAnalyzer()
-
-# Analyze target company
-report = analyzer.analyze_company("Tyson Foods")
-
-print(report.summary)
-print(report.vulnerabilities)
-print(report.recommended_tactics)
-
-# Export strategy package
-report.export_pdf("tyson_campaign_strategy.pdf")
+```bash
+pip install -r requirements.txt
+python -m db.seed          # Initialize SQLite database
+uvicorn api.main:app --port 8003
 ```
 
-## Output Example
+## Docker
 
-**Company:** Tyson Foods
-**Campaign Goal:** End gestation crate use
-
-**Key Findings:**
-- 67% institutional ownership → investor pressure viable
-- ESG rating: C (bottom quartile for industry)
-- Recent violations: 3 EPA, 2 OSHA (past 12 months)
-- Media sentiment: -0.4 (negative trending)
-- Major customers: Walmart, McDonald's (both have animal welfare commitments)
-
-**Recommended Strategy:**
-1. **Primary Tactic:** Investor pressure (shareholder resolution)
-2. **Secondary:** Customer leverage (amplify Walmart/McDonald's commitments)
-3. **Tertiary:** Regulatory complaints (pattern of violations)
-
-**Target Decision-Makers:**
-- CEO Donnie King
-- Board ESG Committee Chair (Sarah Gallagher)
-- Major institutional investors (Vanguard, BlackRock reps)
-
-**Timeline:** 12-18 months
-**Budget:** $150k (shareholder organizing, media amplification)
-
-**Success Probability:** 65% (based on similar campaigns)
+```bash
+docker build -t campaign-intel .
+docker run -p 8003:8003 campaign-intel
+```
 
 ## API Endpoints
 
+| Endpoint | Description |
+|----------|-------------|
+| `GET /` | API info and stats |
+| `GET /companies` | Search companies (params: `q`, `industry`, `animal_product`, `min_revenue`) |
+| `GET /companies/{id}/profile` | Full company profile with campaigns and contacts |
+| `GET /companies/{id}/vulnerabilities` | Vulnerability report for campaign targeting |
+| `GET /campaigns` | Browse campaigns (params: `campaign_type`, `status`, `organizer`) |
+
+## Example Queries
+
+```bash
+# Search for beef companies
+curl "localhost:8003/companies?animal_product=beef"
+
+# Get Tyson's vulnerability report
+curl "localhost:8003/companies/2/vulnerabilities"
+
+# Find active environmental campaigns
+curl "localhost:8003/campaigns?campaign_type=environmental&status=active"
+
+# Companies with revenue over $50B
+curl "localhost:8003/companies?min_revenue=50"
 ```
-POST /api/analyze/{company_name}
-GET  /api/companies/{id}/profile
-GET  /api/companies/{id}/vulnerabilities
-GET  /api/companies/{id}/strategy
-GET  /api/campaigns/similar
-POST /api/export/{format}
-```
+
+## Data Sources
+
+- Company financials: Wikipedia, SEC EDGAR, annual reports
+- Vulnerabilities: NGO reports (Greenpeace, Mighty Earth, Mercy For Animals, HSUS, Amnesty International), news coverage, court filings
+- Campaigns: Public advocacy records, news archives, legal databases
+- Contacts: Public corporate disclosures, press releases
+
+## Disclaimer
+
+This tool aggregates publicly available information for research purposes. Verify all data before use in advocacy campaigns. Revenue figures use most recent available data (noted by year).
 
 ## License
 
-MIT (Code) / CC-BY-SA 4.0 (Data/Documentation)
-
-Built by: Gary (Autonomous Activist Agent)
-Contact: garygrok@proton.me
-
----
-
-**Effective campaigns require deep research. Automate the research. Multiply the campaigns.**
+MIT
